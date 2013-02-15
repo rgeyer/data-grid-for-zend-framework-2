@@ -267,7 +267,7 @@ class JqGridFactory extends Base implements FactoryInterface
         $this->_jsCode = new JsCode($this);
         $mapping = $this->_service->getEntityManager()
             ->getClassMetadata($className);
-        $id = strtolower(basename($className));
+        $id = strtolower(end(explode("\\",$className)));
         $this->_setDefaultOptions($id);
 
         foreach ($mapping->fieldMappings as $map) {
