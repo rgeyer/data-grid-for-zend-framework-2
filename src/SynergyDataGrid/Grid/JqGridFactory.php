@@ -355,7 +355,7 @@ class JqGridFactory extends Base implements FactoryInterface
             ->setAllowDelete(true)
             ->setAllowAdd(true)
             ->setMultiselect(true)
-            ->setNavButton(array(
+            /*->setNavButton(array(
             'icon' => PredefinedIcons::ICON_SUITCASE,
             'action' => new Expr("alert('this is custom navigator button!')"),
             'title' => 'Suitcase',
@@ -366,7 +366,7 @@ class JqGridFactory extends Base implements FactoryInterface
             'title' => "Reorder Columns",
             'caption' => "Columns",
             'position' => 25
-        ));
+        ))*/;
 
         return $this;
     }
