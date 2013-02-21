@@ -23,4 +23,28 @@ return array(
 
         )
     ),
+  // Doctrine config only for tests, could/should find a better place to put
+  // this and still get it loaded for tests.
+    'doctrine' => array(
+      'driver' => array(
+        'SynergyDataGridTest_driver' => array(
+          'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+          'cache' => 'array',
+          'paths' => array(__DIR__ . '/../test/SynergyDataGridTest/Entity')
+        ),
+        'orm_default' => array(
+          'drivers' => array(
+            'SynergyDataGridTest\Entity' => 'SynergyDataGridTest_driver'
+          )
+        )
+      ),
+      'connection' => array(
+        'orm_default' => array(
+          'driverClass' => 'Doctrine\DBAL\Driver\PDOSqlite\Driver',
+          'params' => array(
+            'dbname'   => 'synergydatagrid',
+          )
+        )
+      )
+    )
 );

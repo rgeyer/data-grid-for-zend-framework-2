@@ -261,8 +261,12 @@ class JqGridFactory extends Base implements FactoryInterface
         return $this;
     }
 
-    public function create($className)
+    public function create($className, array $options = array())
     {
+        // Clear the columns
+        $this->setColumns();
+        $default_options = array('association_mappings_type' => 'select_edit');
+        $options = array_merge($default_options, $options);
         $this->_service = $this->_service->getService($className);
         $this->_jsCode = new JsCode($this);
         $mapping = $this->_service->getEntityManager()
@@ -310,20 +314,28 @@ class JqGridFactory extends Base implements FactoryInterface
                 continue;
             }
             $title = ucwords($map['fieldName']);
-            $columnData[$title] = array(
-                'name' => $map['fieldName'],
-                'edittype' => 'select',
-                'stype' => 'select',
-                'hidden' => true,
-                'editrules' => array('edithidden' => true)
-            );
+            if($options['association_mappings_type'] == 'select_edit') {
+              $columnData[$title] = array(
+                  'name' => $map['fieldName'],
+                  'edittype' => 'select',
+                  'stype' => 'select',
+                  'hidden' => true,
+                  'editrules' => array('edithidden' => true)
+              );
 
-            $list = $this->getService()->getEntityManager()->getRepository($map['targetEntity'])->findAll();
-            $values = array(':select');
-            foreach ($list as $item) {
-                $values[] = $item->id . ':' . $item->title;
+              $list = $this->getService()->getEntityManager()->getRepository($map['targetEntity'])->findAll();
+              $values = array(':select');
+              foreach ($list as $item) {
+                  $values[] = $item->id . ':' . $item->title;
+              }
+              $columnData[$title]['editoptions']['value'] = implode(';', $values);
+            } else if($options['association_mappings_type'] == 'read_only') {
+              $columnData[$title] = array(
+                'name' => $map['fieldName'],
+                'editable' => false,
+                'required' => false
+              );
             }
-            $columnData[$title]['editoptions']['value'] = implode(';', $values);
         }
         // close form after edit
         if ($actionColumn = $this->getColumn('myac')) {
@@ -355,6 +367,7 @@ class JqGridFactory extends Base implements FactoryInterface
             'caption' => "Columns",
             'position' => 25
         ));
+
         return $this;
     }
 
@@ -564,8 +577,8 @@ class JqGridFactory extends Base implements FactoryInterface
         $columnNames = array_keys($columns);
 
         foreach ($rows as $k => $row) {
-            if (isset($row['id'])) {
-                $grid->rows[$k]['id'] = $row['id'];
+            if (isset($row->id)) {
+                $grid->rows[$k]['id'] = $row->id;
             }
 
             $grid->rows[$k]['cell'] = array();
@@ -857,7 +870,7 @@ class JqGridFactory extends Base implements FactoryInterface
      *
      * @return \SynergyDataGrid\Grid\JqGridFactory
      */
-    public function setColumns($columns = null)
+    public function setColumns(array $columns = array())
     {
         $this->_columns = $columns;
         return $this;

@@ -90,7 +90,7 @@ class PaginatorAdapter implements AdapterInterface
     public function getItems($offset, $itemCountPerPage)
     {
         $this->_createQuery(false, $offset, $itemCountPerPage);
-        return $this->_qb->getQuery()->getArrayResult();
+        return $this->_qb->getQuery()->getResult();
     }
 
     /**

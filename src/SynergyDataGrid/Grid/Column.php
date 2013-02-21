@@ -60,6 +60,12 @@ class Column extends Base
      */
     protected $_editrules;
     /**
+     * An anonmyous function used to fetch a value from a OneToOne or ManyToOne
+     * association mapped entity
+     * @var anonymous function
+     */
+    protected $_associationMappingFetcher;
+    /**
      * Default rows count for "textarea" editype
      *
      * @var string
@@ -207,7 +213,9 @@ class Column extends Base
      */
     public function cellValue($row)
     {
-        $cellValue = array_key_exists($this->getName(), $row) ? $row[$this->getName()] : '';
+        $associationMappings = $this->getGrid()->getService()->getClassMetadata()->associationMappings;
+        $cellValue = array_key_exists($this->getName(), $row) ? $row->{$this->getName()} : '';
+        $retv = '';
         if ($this->getEdittype() == 'select') {
             $value = $this->getEditoptions()->getValue();
             $retv  = htmlentities($cellValue);
@@ -225,11 +233,22 @@ class Column extends Base
                     }
                 }
             }
-        }elseif($cellValue instanceof \DateTime){
+        } elseif($cellValue instanceof \DateTime){
             /**
              * @var \DateTime $cellValue
              */
             $retv = $cellValue->format(self::DEFAULT_DATETIME_SRCFORMAT);
+        } elseif(array_key_exists($this->getName(), $associationMappings)) {
+            if(isset($this->_associationMappingFetcher)){
+              $anonfunc = $this->_associationMappingFetcher;
+              $retv = $anonfunc($cellValue);
+            } else {
+              if(isset($cellValue->id)) {
+                $retv = $cellValue->id.':'.$associationMappings[$this->getName()]['targetEntity'];
+              } else {
+                $retv = $associationMappings[$this->getName()]['targetEntity'];
+              }
+            }
         } else {
             $retv = htmlentities($cellValue);
         }
@@ -499,6 +518,15 @@ class Column extends Base
     public function setSelectable($selectable = '')
     {
         $this->_selectable = $selectable;
+        return $this;
+    }
+
+    public function getAssociationMappingFetcher() {
+        return $this->_associationMappingFetcher;
+    }
+
+    public function setAssociationMappingFetcher($fetcher = null) {
+        $this->_associationMappingFetcher = $fetcher;
         return $this;
     }
 

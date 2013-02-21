@@ -1,0 +1,8 @@
+<phpunit bootstrap="bootstrap.php"
+  colors="false"
+  verbose="true"
+  >
+    <testsuite name="SynergyDataGrid Tests">
+        <directory>./SynergyDataGridTest</directory>
+    </testsuite>
+</phpunit>
