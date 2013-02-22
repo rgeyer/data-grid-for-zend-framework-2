@@ -20,7 +20,7 @@ class JsCode extends Base
      *
      * @var string
      */
-    private $grid;
+    protected $grid;
 
     /**
      * Set up base JsCode options
